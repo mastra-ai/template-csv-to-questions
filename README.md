@@ -13,7 +13,7 @@ This template demonstrates a streamlined workflow:
 ## Prerequisites
 
 - Node.js 20.9.0 or higher
-- OpenAI API key
+- **OpenAI API key** (required for question generation)
 
 ## Setup
 
@@ -23,11 +23,13 @@ This template demonstrates a streamlined workflow:
    pnpm install
    ```
 
-2. **Set up environment variables:**
+2. **Set up your OpenAI API key:**
 
    ```bash
    export OPENAI_API_KEY="your-openai-api-key-here"
    ```
+
+   > **Important**: You need a valid OpenAI API key for this template to work. Get one from [OpenAI's platform](https://platform.openai.com/api-keys).
 
 3. **Run the example:**
 
@@ -43,6 +45,7 @@ This template demonstrates a streamlined workflow:
 import { mastra } from './src/mastra';
 
 async function runCSVExample() {
+  // Make sure OPENAI_API_KEY is set in your environment
   const run = await mastra.getWorkflow('csvToQuestionsWorkflow').createRunAsync();
 
   const result = await run.start({
@@ -119,6 +122,7 @@ The CSV-specific agent creates questions that cover:
 ### Environment Variables
 
 ```bash
+# Required - get from https://platform.openai.com/api-keys
 OPENAI_API_KEY=your_openai_api_key_here
 ```
 
@@ -152,37 +156,13 @@ src/mastra/
 └── index.ts                        # Mastra configuration
 ```
 
-### Testing
-
-```bash
-# Run with a test CSV
-export OPENAI_API_KEY="your-api-key"
-npx tsx example.ts
-```
-
 ## Example CSV URLs
 
 For testing, you can use these public CSV files:
 
-- World Cities: `https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/1_OneNum.csv`
-- Sample Data: `https://people.sc.fsu.edu/~jburkardt/data/csv/cities.csv`
-- Weather Data: `https://raw.githubusercontent.com/plotly/datasets/master/2014_world_gdp_with_codes.csv`
-
-## Common Issues
-
-### "OPENAI_API_KEY is not set"
-- Make sure you've set the environment variable
-- Check that your API key is valid and has sufficient credits
-
-### "Failed to fetch CSV"
-- Verify the CSV URL is accessible and returns valid CSV data
-- Check network connectivity
-- Ensure the URL points to a raw CSV file (not a webpage)
-
-### "CSV has no valid rows"
-- The CSV file might be empty or have formatting issues
-- Check if the CSV uses standard comma delimiters
-- Verify the file is a valid CSV format
+- World GDP Data: `https://raw.githubusercontent.com/plotly/datasets/master/2014_world_gdp_with_codes.csv`
+- Cities Data: `https://people.sc.fsu.edu/~jburkardt/data/csv/cities.csv`
+- Sample Dataset: `https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/1_OneNum.csv`
 
 ## What Makes This Template Special
 
@@ -205,6 +185,11 @@ For testing, you can use these public CSV files:
 - Simple URL-based input
 - Structured JSON output
 - Clear workflow steps
+
+### 🛠️ **Developer-Friendly**
+- Comprehensive error handling
+- Detailed debug logging
+- Clear troubleshooting guide
 
 ## Contributing
 

@@ -73,6 +73,8 @@ const generateQuestionsStep = createStep({
         throw new Error('CSV question generator agent not found');
       }
 
+      console.log('📝 Sending data to agent for question generation...');
+
       const streamResponse = await agent.stream([
         {
           role: 'user',
@@ -95,10 +97,24 @@ Create questions that help someone understand:
       ]);
 
       let generatedContent = '';
+      let chunkCount = 0;
 
-      for await (const chunk of streamResponse.textStream) {
-        generatedContent += chunk || '';
+      console.log('📡 Streaming response from agent...');
+
+      try {
+        for await (const chunk of streamResponse.textStream) {
+          if (chunk) {
+            generatedContent += chunk;
+            chunkCount++;
+          }
+        }
+      } catch (streamError) {
+        console.error('🚨 Error during streaming:', streamError);
+        throw streamError;
       }
+
+      console.log(`📊 Received ${chunkCount} chunks, total length: ${generatedContent.length}`);
+      console.log(`📋 Generated content preview: ${generatedContent.substring(0, 200)}...`);
 
       if (generatedContent.trim().length > 20) {
         // Parse the questions from the generated content
@@ -110,8 +126,16 @@ Create questions that help someone understand:
         return { questions, success: true };
       } else {
         console.warn(
-          'Step generate-questions: Failed - Generated content too short'
+          `Step generate-questions: Failed - Generated content too short (${generatedContent.length} chars)`
         );
+        console.warn('Generated content:', generatedContent);
+
+        // Check if OpenAI API key is set
+        if (!process.env.OPENAI_API_KEY) {
+          console.error('🚨 OPENAI_API_KEY environment variable is not set!');
+          console.error('Please set your OpenAI API key: export OPENAI_API_KEY="your-api-key"');
+        }
+
         return { questions: [], success: false };
       }
     } catch (error) {
@@ -119,6 +143,18 @@ Create questions that help someone understand:
         'Step generate-questions: Failed - Error during generation:',
         error
       );
+
+      // Check for common API errors
+      if (error instanceof Error) {
+        if (error.message.includes('401')) {
+          console.error('🚨 Authentication error - check your OpenAI API key');
+        } else if (error.message.includes('429')) {
+          console.error('🚨 Rate limit exceeded - please try again later');
+        } else if (error.message.includes('insufficient_quota')) {
+          console.error('🚨 OpenAI API quota exceeded - check your billing');
+        }
+      }
+
       return { questions: [], success: false };
     }
   },
