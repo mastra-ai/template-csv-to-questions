@@ -1,4 +1,4 @@
-import { openai } from '@ai-sdk/openai';
+import { groq } from '@ai-sdk/groq';
 import { Agent } from '@mastra/core/agent';
 import { csvFetcherTool } from '../tools/download-csv-tool';
 import { generateQuestionsFromTextTool } from '../tools/generate-questions-from-text-tool';
@@ -73,7 +73,7 @@ Generate questions that cover:
 
 Always be helpful and provide clear feedback about the process and results, with emphasis on the analytical aspects of the CSV data.
   `,
-  model: openai('gpt-4o'),
+  model: groq(process.env.MODEL ?? "llama-3.3-70b-versatile"),
   tools: {
     csvFetcherTool,
     generateQuestionsFromTextTool,
