@@ -2,7 +2,7 @@
 
 A Mastra template that demonstrates **how to protect against token limits** by generating AI summaries from large CSV datasets before passing as output from tool calls.
 
-> **🎯 Key Learning**: This template shows how to use large context window models (OpenAI GPT-4.1 Mini) as a "summarization layer" to compress large CSV datasets into focused summaries, enabling efficient downstream processing without hitting token limits.
+> **🎯 Key Learning**: This template shows how to use large context window models (Groq GPT-4.1 Mini) as a "summarization layer" to compress large CSV datasets into focused summaries, enabling efficient downstream processing without hitting token limits.
 
 ## Overview
 
@@ -10,12 +10,12 @@ This template showcases a crucial architectural pattern for working with large d
 
 **🚨 The Problem**: Large CSV files can contain 100,000+ rows and columns, which would overwhelm context windows and cost thousands of tokens for processing.
 
-**✅ The Solution**: Use a large context window model (OpenAI GPT-4.1 Mini) to generate focused summaries, then use those summaries for downstream processing.
+**✅ The Solution**: Use a large context window model (Groq GPT-4.1 Mini) to generate focused summaries, then use those summaries for downstream processing.
 
 ### Workflow
 
 1. **Input**: CSV URL
-2. **Download & Summarize**: Fetch CSV, parse data, and generate AI summary using OpenAI GPT-4.1 Mini
+2. **Download & Summarize**: Fetch CSV, parse data, and generate AI summary using Groq GPT-4.1 Mini
 3. **Generate Questions**: Create focused questions from the summary (not the raw data)
 
 ### Key Benefits
@@ -28,7 +28,7 @@ This template showcases a crucial architectural pattern for working with large d
 ## Prerequisites
 
 - Node.js 20.9.0 or higher
-- OpenAI API key (for both summarization and question generation)
+- Groq API key (for both summarization and question generation)
 
 ## Setup
 
@@ -48,7 +48,7 @@ This template showcases a crucial architectural pattern for working with large d
    ```
 
    ```env
-   OPENAI_API_KEY="your-openai-api-key-here"
+   GROQ_API_KEY="your-openai-api-key-here"
    ```
 
 3. **Run the example:**
@@ -74,7 +74,7 @@ When processing large CSV files (sales data, logs, surveys), you often encounter
 
 Instead of passing raw CSV data through your pipeline:
 
-1. **Use a large context window model** (OpenAI GPT-4.1 Mini) to digest the full dataset
+1. **Use a large context window model** (Groq GPT-4.1 Mini) to digest the full dataset
 2. **Generate focused summaries** that capture key insights and patterns
 3. **Pass summaries to downstream processing** instead of raw data
 
@@ -208,9 +208,9 @@ console.log(questionsResult.questions);
 
 - ✅ **Token Limit Protection**: Demonstrates how to handle large datasets without hitting context limits
 - ✅ **80-95% Token Reduction**: AI summarization drastically reduces processing costs
-- ✅ **Large Context Window**: Uses OpenAI GPT-4.1 Mini to handle large datasets efficiently
+- ✅ **Large Context Window**: Uses Groq GPT-4.1 Mini to handle large datasets efficiently
 - ✅ **Zero System Dependencies**: Pure JavaScript solution
-- ✅ **Single API Setup**: OpenAI for both summarization and question generation
+- ✅ **Single API Setup**: Groq for both summarization and question generation
 - ✅ **Fast Data Processing**: Direct CSV parsing with intelligent sampling
 - ✅ **Data Analysis Focus**: Generates questions focused on patterns, insights, and practical applications
 - ✅ **Multiple Interfaces**: Workflow, Agent, and individual tools available
@@ -249,7 +249,7 @@ This template uses a **pure JavaScript approach** that works for most CSV files:
 ### Environment Variables
 
 ```bash
-OPENAI_API_KEY=your_openai_api_key_here
+GROQ_API_KEY=your_openai_api_key_here
 ```
 
 ### Customization
@@ -289,13 +289,13 @@ src/mastra/
 
 ```bash
 # Run with a test CSV
-export OPENAI_API_KEY="your-api-key"
+export GROQ_API_KEY="your-api-key"
 npx tsx example.ts
 ```
 
 ## Common Issues
 
-### "OPENAI_API_KEY is not set"
+### "GROQ_API_KEY is not set"
 
 - Make sure you've set the environment variable
 - Check that your API key is valid and has sufficient credits
@@ -378,7 +378,7 @@ This token limit protection pattern can be applied to many other scenarios:
 
 ### Implementation Tips
 
-- Use **OpenAI GPT-4.1 Mini** for initial summarization (large context window)
+- Use **Groq GPT-4.1 Mini** for initial summarization (large context window)
 - Pass **summaries** to downstream tools, not raw data
 - **Chain summaries** for multi-step processing
 - **Preserve metadata** (row count, column info) for context
