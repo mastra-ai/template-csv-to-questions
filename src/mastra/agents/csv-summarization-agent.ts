@@ -1,4 +1,4 @@
-import { openai } from '@ai-sdk/openai';
+import { groq } from '@ai-sdk/groq';
 import { Agent } from '@mastra/core/agent';
 import { LibSQLStore } from '@mastra/libsql';
 import { Memory } from '@mastra/memory';
@@ -97,6 +97,6 @@ Format your summaries with:
 
 Always provide summaries that would allow someone to understand the dataset's core value and potential applications without analyzing the raw data.
   `,
-  model: openai('gpt-4.1-mini'), // Large context window model for summarization
+  model: groq(process.env.MODEL ?? "llama-3.3-70b-versatile"), // Large context window model for summarization
   memory,
 });
