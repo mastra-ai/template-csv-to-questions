@@ -104,7 +104,7 @@ const questions = await generateQuestions(summary); // Much better!
 ```typescript
 import { mastra } from './src/mastra/index';
 
-const run = await mastra.getWorkflow('csvToQuestionsWorkflow').createRunAsync();
+const run = await mastra.getWorkflow('csvToQuestionsWorkflow').createRun();
 
 // Using a CSV URL
 const result = await run.start({
@@ -140,28 +140,39 @@ for await (const chunk of response.textStream) {
 
 ```typescript
 import { mastra } from './src/mastra/index';
+import { RequestContext } from '@mastra/core/request-context';
 import { csvFetcherTool } from './src/mastra/tools/download-csv-tool';
 import { generateQuestionsFromTextTool } from './src/mastra/tools/generate-questions-from-text-tool';
 
 // Step 1: Download CSV and generate summary
-const csvResult = await csvFetcherTool.execute({
-  context: { csvUrl: 'https://example.com/dataset.csv' },
-  mastra,
-  runtimeContext: new RuntimeContext(),
-});
+const csvResult = await csvFetcherTool.execute(
+  { csvUrl: 'https://example.com/dataset.csv' },
+  { mastra, requestContext: new RequestContext() }
+);
+
+// Check for errors
+if ('error' in csvResult) {
+  console.error('CSV download failed:', csvResult.error);
+  process.exit(1);
+}
 
 console.log(`Downloaded ${csvResult.fileSize} bytes from ${csvResult.rowCount} rows`);
 console.log(`Generated ${csvResult.summary.length} character summary`);
 
 // Step 2: Generate questions from summary
-const questionsResult = await generateQuestionsFromTextTool.execute({
-  context: {
+const questionsResult = await generateQuestionsFromTextTool.execute(
+  {
     extractedText: csvResult.summary,
     maxQuestions: 10,
   },
-  mastra,
-  runtimeContext: new RuntimeContext(),
-});
+  { mastra, requestContext: new RequestContext() }
+);
+
+// Check for errors
+if ('error' in questionsResult) {
+  console.error('Question generation failed:', questionsResult.error);
+  process.exit(1);
+}
 
 console.log(questionsResult.questions);
 ```
