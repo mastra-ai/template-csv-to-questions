@@ -1,6 +1,6 @@
 import { createStep, createWorkflow } from '@mastra/core/workflows';
 import { z } from 'zod';
-import { RequestContext } from '@mastra/core/request-context';
+import { RequestContext } from '@mastra/core/di';
 import { csvFetcherTool } from '../tools/download-csv-tool';
 import { generateQuestionsFromTextTool } from '../tools/generate-questions-from-text-tool';
 
@@ -34,13 +34,14 @@ const downloadAndSummarizeCSVStep = createStep({
 
     const result = await csvFetcherTool.execute(
       { csvUrl },
-      { mastra, requestContext: requestContext || new RequestContext() }
+      {
+        mastra,
+        requestContext: requestContext || new RequestContext(),
+      },
     );
 
-    // Check for validation error
     if ('error' in result) {
-      console.error('Step download-and-summarize-csv: Failed - Tool execution error:', result.error);
-      throw new Error('CSV download and summarization failed');
+      throw new Error('Failed to download and summarize CSV: ' + result.error);
     }
 
     console.log(
@@ -69,13 +70,14 @@ const generateQuestionsFromSummaryStep = createStep({
 
     try {
       const result = await generateQuestionsFromTextTool.execute(
-        { extractedText: summary },
-        { mastra, requestContext: requestContext || new RequestContext() }
+        { extractedText: summary }, // Use summary as the text input
+        {
+          mastra,
+          requestContext: requestContext || new RequestContext(),
+        },
       );
 
-      // Check for validation error
       if ('error' in result) {
-        console.error('Step generate-questions-from-summary: Failed - Tool execution error:', result.error);
         return { questions: [], success: false };
       }
 

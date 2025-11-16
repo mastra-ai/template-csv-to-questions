@@ -27,8 +27,8 @@ This template showcases a crucial architectural pattern for working with large d
 
 ## Prerequisites
 
-- Node.js 22.13.0 or higher
-- OpenAI API key (for both summarization and question generation)
+- Node.js 20.9.0 or higher
+- API key for your chosen provider (for both summarization and question generation)
 
 ## Setup
 
@@ -56,6 +56,19 @@ This template showcases a crucial architectural pattern for working with large d
    ```bash
    npx tsx example.ts
    ```
+
+## Model Configuration
+
+This template supports any AI model provider through Mastra's model router. You can use models from:
+
+- **OpenAI**: `openai/gpt-4o-mini`, `openai/gpt-4o`
+- **Anthropic**: `anthropic/claude-sonnet-4-5-20250929`, `anthropic/claude-haiku-4-5-20250929`
+- **Google**: `google/gemini-2.5-pro`, `google/gemini-2.0-flash-exp`
+- **Groq**: `groq/llama-3.3-70b-versatile`, `groq/llama-3.1-8b-instant`
+- **Cerebras**: `cerebras/llama-3.3-70b`
+- **Mistral**: `mistral/mistral-medium-2508`
+
+Set the `MODEL` environment variable in your `.env` file to your preferred model.
 
 ## 🏗️ Architectural Pattern: Token Limit Protection
 
@@ -140,39 +153,28 @@ for await (const chunk of response.textStream) {
 
 ```typescript
 import { mastra } from './src/mastra/index';
-import { RequestContext } from '@mastra/core/request-context';
 import { csvFetcherTool } from './src/mastra/tools/download-csv-tool';
 import { generateQuestionsFromTextTool } from './src/mastra/tools/generate-questions-from-text-tool';
 
 // Step 1: Download CSV and generate summary
-const csvResult = await csvFetcherTool.execute(
-  { csvUrl: 'https://example.com/dataset.csv' },
-  { mastra, requestContext: new RequestContext() }
-);
-
-// Check for errors
-if ('error' in csvResult) {
-  console.error('CSV download failed:', csvResult.error);
-  process.exit(1);
-}
+const csvResult = await csvFetcherTool.execute({
+  context: { csvUrl: 'https://example.com/dataset.csv' },
+  mastra,
+  runtimeContext: new RuntimeContext(),
+});
 
 console.log(`Downloaded ${csvResult.fileSize} bytes from ${csvResult.rowCount} rows`);
 console.log(`Generated ${csvResult.summary.length} character summary`);
 
 // Step 2: Generate questions from summary
-const questionsResult = await generateQuestionsFromTextTool.execute(
-  {
+const questionsResult = await generateQuestionsFromTextTool.execute({
+  context: {
     extractedText: csvResult.summary,
     maxQuestions: 10,
   },
-  { mastra, requestContext: new RequestContext() }
-);
-
-// Check for errors
-if ('error' in questionsResult) {
-  console.error('Question generation failed:', questionsResult.error);
-  process.exit(1);
-}
+  mastra,
+  runtimeContext: new RuntimeContext(),
+});
 
 console.log(questionsResult.questions);
 ```
@@ -269,6 +271,7 @@ You can customize the question generation by modifying the agents:
 
 ```typescript
 export const textQuestionAgent = new Agent({
+  id: 'generate-questions-agent',
   name: 'Generate questions from text agent',
   instructions: `
     // Customize instructions here for different question types
